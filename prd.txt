@@ -1,0 +1,72 @@
+# PRD: Multi-Modal Document Intelligence System (MVP)
+
+## 1. Project Overview
+w
+**Objective:** Build an AI-driven system to intelligently extract, reason, and validate data from complex, multi-modal documents (PDFs/Scanned Images).
+**Target Persona:** Construction estimators and project planners at QuickPlans AI.
+**Core Value Prop:** Move from raw, messy documents to structured, validated data with zero manual "plumbing."
+
+---
+
+## 2. Technical Stack (The "Golden Stack")
+
+| Layer | Technology | Rationale |
+| --- | --- | --- |
+| **Orchestration** | **Pixeltable** | Replaces ETL scripts & separate Vector DBs. Handles state and incremental updates natively. |
+| **OCR / Layout** | **Chandra OCR** | SOTA (2026) for layout-aware extraction and complex table parsing. |
+| **Vision/LLM** | **Qwen3-VL-8B** | Unified model for visual reasoning, diagram understanding, and "Thinking Mode." |
+| **RAG / Search** | **Qwen3-VL (Embed/Rerank)** | Native cross-modal retrieval. Reranker acts as the "Fusion Agent." |
+| **Interface** | **FastAPI + Streamlit** | Lightweight API for core logic and a clean UI for the demo. |
+
+---
+
+## 3. Functional Requirements (Mapped to Deliverables)
+
+### 3.1 Multi-Modal Pipeline (Mandatory)
+
+* **Ingestion:** Pixeltable "watches" a directory. New PDFs trigger automatic processing.
+* **Decomposition:** Pixeltable `DocumentSplitter` chunks pages while preserving image references.
+* **Layout Extraction:** Chandra OCR converts pages into structured Markdown (Text) and separate Image assets (Tables/Diagrams).
+
+### 3.2 Multi-Agent System (Minimum 3 Agents)
+
+* **Vision Agent:** Identifies visual landmarks (signatures, site plans, stamp presence) using Qwen3-VL.
+* **Text Agent:** Reasons over the Chandra-extracted Markdown to pull key project details (Dates, Totals, Clauses).
+* **Fusion & Validation Agent:** * Uses **Qwen3-VL-Reranker** to cross-check if the visual chart matches the extracted text.
+* Applies a **Confidence Score** based on the delta between OCR confidence and Reranker score.
+
+
+
+### 3.3 Multi-Modal RAG System
+
+* **Vector Index:** Pixeltable `.add_embedding_index` using Qwen3-VL-Embedding (MRL supported for efficiency).
+* **Querying:** User can ask: *"Find the section with the site map and explain the text next to it."* System retrieves the specific image crop + text chunk.
+
+---
+
+## 4. User Experience (The Demo)
+
+* **Workflow:**
+1. User uploads an "arXiv paper with diagrams" or a "Construction Blueprint."
+2. Dashboard shows real-time progress (OCR → Vision Check → Fusion).
+3. Final output: A structured JSON of data + a "Validation Flag" (Green/Red) for extracted info.
+4. Visual highlight: Clicking a data point shows the original bounding box on the image.
+
+
+
+---
+
+## 5. Innovation & "Bonus" Strategy
+
+* **Technical Excellence (+5):** Use **Matryoshka Embeddings (MRL)** within Pixeltable to show the system's ability to handle high-volume data with low latency.
+* **Advanced Features (+5):** Handle **Handwriting** (using Chandra's native capability) as a third modality (Print + Image + Handwriting).
+* **Innovation (+5):** Implement **"Self-Correction Loop"**—if the Fusion Agent score is below 0.7, trigger Qwen3-VL's **Thinking Mode** to re-analyze the specific visual segment.
+
+---
+
+## 6. Success Metrics
+
+* **Accuracy:** >90% on multi-modal documents (compared to human baseline).
+* **Latency:** End-to-end processing of a 5-page document in <15 seconds.
+* **Code Quality:** PEP8 compliant, Dockerized, and 0 manual data movements (100% Pixeltable orchestrated).
+

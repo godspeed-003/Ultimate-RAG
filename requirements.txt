@@ -1,0 +1,8 @@
+pixeltable
+streamlit
+pydantic-settings
+torch
+pandas
+vllm
+# Note: chandra-ocr is assumed to be available or installed via a specific wheel/repo
+# chandra-ocr
